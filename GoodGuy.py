@@ -22,38 +22,42 @@ class QLearning():
 		for episode in range(QLearning.EPISODES + QLearning.GAMES_TO_PLAY):
 			if episode >= QLearning.EPISODES:
 				QLearning.NOGUI = False
-				print "\nGame Playing", (episode + 1) - QLearning.EPISODES,
+				if episode == QLearning.EPISODES:
+					print "\n"
+					
+				print "Game Playing", (episode + 1) - QLearning.EPISODES,
 			else:
-				print "\rTraining %d" % (episode + 1),
-				sys.stdout.flush()
+				print "Training %d" % (episode + 1),
 
 			curr_state = self.getStartStatePos() #start state
-			
 
-			while not self.gameConfig.isMonsterPos(curr_state) and \
-				not self.gameConfig.isGoalState(curr_state):
-
-					new_guy_pos_tup = self.getAction(curr_state,episode)
-					mons_pos_acts = map(lambda pos: self.getMonsterLegalActions(pos), 
-						self.gameConfig.monsters_pos)
+			while not self.gameConfig.isMonsterPos(curr_state) and not \
+				self.gameConfig.isGoalState(curr_state):
+		
+				new_guy_pos_tup = self.getAction(curr_state,episode)
+				mons_pos_acts = map(lambda pos: self.getMonsterLegalActions(pos), 
+					self.gameConfig.monsters_pos)
 					
-					self.dispatchMovements(new_guy_pos_tup[0], mons_pos_acts,episode)
+				self.dispatchMovements(new_guy_pos_tup[0], mons_pos_acts,episode)
 
-					immediate_reward = self.gameConfig.getReward(curr_state)
-					curr_QVal = self.getQValue(curr_state,new_guy_pos_tup[1])
-					max_qprime = self.getQPrimeVal()
+				immediate_reward = self.gameConfig.getReward(curr_state)
+				curr_QVal = self.getQValue(curr_state,new_guy_pos_tup[1])
+				max_qprime = self.getQPrimeVal()
 
-					difference = (immediate_reward + QLearning.DISCOUNT_FACTOR * \
-						max_qprime) - curr_QVal
+				difference = (immediate_reward + QLearning.DISCOUNT_FACTOR * \
+					max_qprime) - curr_QVal
 
-					f_vector = self.getFeatures(curr_state, new_guy_pos_tup[1])
-					for feature in f_vector:
-						old_weight = self.weight_vector[feature]
-						self.weight_vector[feature] = old_weight + QLearning.LEARNING_RATE \
-							* difference * f_vector[feature]
-					curr_state = self.gameConfig.guy_pos
+				f_vector = self.getFeatures(curr_state, new_guy_pos_tup[1])
+				for feature in f_vector:
+					old_weight = self.weight_vector[feature]
+					self.weight_vector[feature] = old_weight + QLearning.LEARNING_RATE \
+						* difference * f_vector[feature]
+				curr_state = self.gameConfig.guy_pos
 			
-
+			eaten = self.gameConfig.isMonsterPos(curr_state)
+			goal_reached = self.gameConfig.isGoalState(curr_state)
+			outcome = "EATEN" if eaten else "GOAL"
+			print outcome
 			#new game
 			self.gameConfig.newGame(QLearning.NOGUI)
 
@@ -218,7 +222,7 @@ def main():
   	turtle.setup (screen_width, screen_height, None, None)
   	turtle_gui = TurtleGUI()
 
-	QLearning(turtle_gui,True)
+	QLearning(turtle_gui, True)
 	
 	turtle.done()
 	
