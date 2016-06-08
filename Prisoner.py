@@ -29,7 +29,11 @@ class Prisoner(BaseTurtle):
 
 	def getRandomColor(self):
 		color_list = ["violet", "orange", "cyan", "black", "brown", "royal blue"]
-		return color_list[random.randint(0,len(color_list)-1)]
+		self.curr_color = color_list[random.randint(0,len(color_list)-1)]
+		return self.curr_color
+
+	def getCurrColor(self):
+		return self.curr_color
 
 	def move(self, coord):
 		self.prisoner.penup()

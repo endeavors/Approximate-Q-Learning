@@ -9,7 +9,7 @@ class GameConfig():
 	GUY, MONSTER, PRISONER, WALL = range(1000, 1004)
 	PRISONER_RW = 100
 	MONSTER_RW = -100
-	REST_RW = -1
+	REST_RW = -10
 	PROB_OF_ATTACK = 0.5
 
 	def __init__(self, turtle_gui):
@@ -81,7 +81,7 @@ class QLearning():
 				self.drawAllTurtles()
 				self.gameConfig.updateObjPoses(self.turtle_gui)
 			
-			curr_state = self.getStartStatePos(False) #start state
+			curr_state = self.getStartStatePos() #start state
 			
 			print "\rTraining %d" % (episode + 1),
 			sys.stdout.flush()
@@ -149,7 +149,7 @@ class QLearning():
 		base_move = self.gameConfig.actions[action_str]
 		return (state[0]+base_move[0], state[1]+base_move[1])
 
-	def getStartStatePos(self,isRandom):
+	def getStartStatePos(self,isRandom=True):
 
 		if isRandom:
 			y = random.randint(0,gridsize-1)
@@ -197,11 +197,8 @@ class QLearning():
 			self.gameConfig.monsters_pos])
 		features = Counter()	
 		features["dist_to_rw"] = dist_to_rw/100.0
-
-		#features["dist_to_mon"] = dist_to_mon/100.0
 		features["ghosts_num"] = sum(next_pos in self.getMonsterLegalActions(mon_pos) \
 			for mon_pos in self.gameConfig.monsters_pos)
-
 
 		return features
 
