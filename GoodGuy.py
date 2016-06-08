@@ -4,7 +4,7 @@ import math, sys
 import numpy as np
 
 class QLearning():
-	LEARNING_RATE = 0.5
+	LEARNING_RATE = 0.7
 	DISCOUNT_FACTOR = 0.6 
 	EPISODES = 500
 	TEMPERATURE = 30.0
@@ -33,11 +33,13 @@ class QLearning():
 
 			curr_state = self.getStartStatePos() #start state
 
-			while not self.gameConfig.isMonsterPos(curr_state) and not \
-				self.gameConfig.isGoalState(curr_state):
-		
+			while not self.gameConfig.isMonsterPos(curr_state):
+				
+				if self.gameConfig.isGoalState(curr_state):
+					self.gameConfig.updateReward(QLearning.NOGUI)
+					if self.gameConfig.isGameFinished(): break
+
 				new_guy_pos_tup = self.getAction(curr_state,episode)
-				#print new_guy_pos_tup
 
 				mons_pos_acts = map(lambda pos: self.getMonsterLegalActions(pos), 
 					self.gameConfig.monsters_pos)
@@ -60,7 +62,6 @@ class QLearning():
 
 			
 			eaten = self.gameConfig.isMonsterPos(curr_state)
-			goal_reached = self.gameConfig.isGoalState(curr_state)
 			outcome = "EATEN" if eaten else "GOAL"
 			print outcome
 			#new game
@@ -106,7 +107,7 @@ class QLearning():
 			zipy, zipx = zip(state,val)
 			y = sum(zipy)
 			x = sum(zipx)
-			if y >= 0 and y < gridsize and x >= 0 and x < gridsize and \
+			if y >= 0 and y <= gridsize and x >= 0 and x <= gridsize and \
 				not self.gameConfig.isWallPos((y,x)):
 				actions[act_str] = (y,x)
 		
@@ -118,7 +119,7 @@ class QLearning():
 			zipy, zipx = zip(state,val)
 			y = sum(zipy)
 			x = sum(zipx)
-			if y >= 0 and y < gridsize and x >= 0 and x < gridsize and \
+			if y >= 0 and y <= gridsize and x >= 0 and x <= gridsize and \
 				not self.gameConfig.isWallPos((y,x)) and y > TurtleGUI.lower_mons_y and \
 				y < TurtleGUI.upper_mons_y and x > TurtleGUI.lower_mons_x and \
 				x < TurtleGUI.upper_mons_x:
@@ -258,7 +259,7 @@ def main():
   	turtle.setup (screen_width, screen_height, None, None)
   	turtle_gui = TurtleGUI()
 
-	QLearning(turtle_gui, True)
+	QLearning(turtle_gui,True)
 	
 	turtle.done()
 	

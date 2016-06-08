@@ -8,8 +8,8 @@ class GameConfig():
 	PRISONER_RW = 100
 	MONSTER_RW = -100
 	REST_RW = -10
-	PROB_OF_ATTACK = 0.9
-	MONS_NUM = 15
+	PROB_OF_ATTACK = 0.5
+	MONS_NUM = 1
 	PRIS_NUM = 4
 
 	def __init__(self, turtle_gui):
@@ -31,8 +31,9 @@ class GameConfig():
 				mon_pos = GameConfig.genMonsNewPos()
 				self.monsters_pos[x] = convToGridPos(mon_pos)
 
-			for p_idx, pos in enumerate(GameConfig.genPrisPosList(len(self.prisoners_pos))):
-				self.prisoners_pos[p_idx] = pos
+			del self.prisoners_pos[:]
+			for p_idx, pos in enumerate(GameConfig.genPrisPosList(GameConfig.PRIS_NUM)):
+				self.prisoners_pos.append(pos)
 				
 		else:
 			self.tur_gui.resetAllTurtles()
@@ -65,7 +66,7 @@ class GameConfig():
 		self.tur_gui.addMonsters(GameConfig.MONS_NUM, [self.genMonsNewPos() \
 			for x in range(GameConfig.MONS_NUM)])
 		self.tur_gui.addPrisoners(GameConfig.PRIS_NUM, \
-			self.genPrisPosList(GameConfig.PRIS_NUM))
+			GameConfig.genPrisPosList(GameConfig.PRIS_NUM))
 		self.tur_gui.addGoodGuy()
 
 	def getReward(self, state):
@@ -77,16 +78,21 @@ class GameConfig():
 			return GameConfig.REST_RW
 
 	def getRewardPos(self):
-		if not self.isGameFinished():
-			self.prisoners_pos.sort(key=lambda x: x[1])
-			return self.prisoners_pos[0]
-		return None
+		sorted_pris = sorted(self.prisoners_pos,key=lambda x: x[1])
+		return sorted_pris[0]
 
 	def isGameFinished(self):
-		for y,x in self.prisoners_pos:
-			if y <= convYToGridPos(wall1_y)+1 and x >= wall_length:
-				return False
+		if len(self.prisoners_pos) != 0:
+			return False
 		return True
+
+	def updateReward(self,nogui):
+		pris_idx = self.prisoners_pos.index(self.getRewardPos())
+		del self.prisoners_pos[pris_idx]
+		if not nogui:
+			pris = self.tur_gui.prisoner_list[pris_idx]
+			pris.reset()
+
 
 	def isWallPos(self, state):
 		return state in self.walls
