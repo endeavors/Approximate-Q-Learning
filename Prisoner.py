@@ -40,4 +40,3 @@ class Prisoner(BaseTurtle):
 
 	def reset(self):
 		self.prisoner.clear()
-		
