@@ -2,11 +2,10 @@ from util import *
 import turtle
 
 class GoodGuyTurtle(BaseTurtle):
-	length = 0
+
 	color = "green4"
 
-	def __init__(self,startx,starty,length):
-		GoodGuyTurtle.length = length
+	def __init__(self):
 		self.good_guy = turtle.Turtle()
 		self.good_guy.hideturtle()
 		self.good_guy.speed("fastest")
@@ -30,7 +29,7 @@ class GoodGuyTurtle(BaseTurtle):
 	def move(self, coord):
 		self.good_guy.penup()
 		pos = convToGUIPos(coord)
-		self.good_guy.goto(pos[0] + GoodGuyTurtle.length/2, pos[1])
+		self.good_guy.goto(pos[0] + sq_length/2, pos[1])
 
 	def resetTracer(self):
 		self.good_guy.tracer(1,15) #1,5

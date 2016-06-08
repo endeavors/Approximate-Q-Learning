@@ -2,10 +2,8 @@ from util import *
 import turtle, random
 
 class Prisoner(BaseTurtle):
-	length = 0
 
-	def __init__(self,starty,startx, length):
-		Prisoner.length = length
+	def __init__(self,starty,startx):
 		self.prisoner = turtle.Turtle()
 		self.prisoner.speed("fastest")
 		self.prisoner.tracer(1,1)
@@ -20,7 +18,7 @@ class Prisoner(BaseTurtle):
 		self.prisoner.pencolor(color)
 		self.prisoner.pendown()
 		for i in range(4):
-			self.prisoner.forward(Prisoner.length)
+			self.prisoner.forward(sq_length)
 			self.prisoner.left(360/4)
 		self.prisoner.end_fill()
 

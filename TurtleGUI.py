@@ -45,19 +45,18 @@ class TurtleGUI():
 		
 	def addMonsters(self,monster_num,pos):
 		for num in range(monster_num):
-			monster = Monster.Monster(pos[num][0],pos[num][1], tri_length)
+			monster = Monster.Monster(pos[num][0],pos[num][1])
 			monster.drawTurtle()
 			self.monster_list.append(monster)
  
  	def addPrisoners(self,prisoner_num, pos):
  		for num in range(prisoner_num):
- 			prisoner = Prisoner.Prisoner(pos[num][0],pos[num][1], sq_length)
+ 			prisoner = Prisoner.Prisoner(pos[num][0],pos[num][1])
  			prisoner.drawTurtle()
  			self.prisoner_list.append(prisoner)
  			
  	def addGoodGuy(self):
- 		self.good_guy = GoodGuyTurtle.GoodGuyTurtle(4, gridsize - 2,
- 			sq_length)
+ 		self.good_guy = GoodGuyTurtle.GoodGuyTurtle()
  		#self.good_guy.drawTurtle() #commented out
  		self.good_guy.resetTracer()
 

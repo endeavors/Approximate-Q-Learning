@@ -2,10 +2,8 @@ from util import *
 import turtle
 
 class Monster(BaseTurtle):
-	length = 0
 
-	def __init__(self,starty,startx, length):
-		Monster.length = length
+	def __init__(self,starty,startx):
 		self.monster = turtle.Turtle()
 		self.monster.speed("fastest")
 		self.monster.hideturtle()
@@ -18,7 +16,7 @@ class Monster(BaseTurtle):
 		self.monster.fillcolor("red")
 		self.monster.pencolor("red")
 		self.monster.begin_fill()
-		self.monster.circle(Monster.length, steps=5)
+		self.monster.circle(tri_length, steps=5)
 		self.monster.end_fill()
 
 	def getPos(self):
@@ -27,7 +25,7 @@ class Monster(BaseTurtle):
 	def move(self, coord):
 		self.monster.penup()
 		pos = convToGUIPos(coord)
-		self.monster.goto(pos[0] + ((Monster.length)/2), pos[1] - ((Monster.length)/2))
+		self.monster.goto(pos[0] + ((tri_length)/2), pos[1] - ((tri_length)/2))
 
 	def resetTracer(self):
 		self.monster.tracer(1,15) #1,15 #0,0

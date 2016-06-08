@@ -11,17 +11,64 @@ class GameConfig():
 	MONSTER_RW = -100
 	REST_RW = -10
 	PROB_OF_ATTACK = 0.5
+	MONS_NUM = 1
+	PRIS_NUM = 4
 
 	def __init__(self, turtle_gui):
+		self.tur_gui = turtle_gui
 		self.walls = [(convYToGridPos(wall1_y)+1,x) for x in range(wall_length+1)] + \
 			[(convYToGridPos(wall2_y)+1,x) for x in range(gridsize-wall_length,gridsize+1)]
 		#only get info from the GUI the first time, that's why we are in init
-		self.updateObjPoses(turtle_gui)
+		self.drawAllTurtles()
+		self.updateObjPoses()
 
-	def updateObjPoses(self,turtle_gui):
-		self.prisoners_pos = map(lambda x: x.getPos(), turtle_gui.prisoner_list)
-		self.monsters_pos = map(lambda x: x.getPos(), turtle_gui.monster_list)
-		self.guy_pos = turtle_gui.good_guy.getPos()
+	def updateObjPoses(self):
+		self.prisoners_pos = map(lambda x: x.getPos(), self.tur_gui.prisoner_list)
+		self.monsters_pos = map(lambda x: x.getPos(), self.tur_gui.monster_list)
+		self.guy_pos = self.tur_gui.good_guy.getPos()
+
+	def newGame(self):
+		if QLearning.NOGUI:
+			for x in range(len(self.tur_gui.monster_list)):
+				mon_pos = GameConfig.genMonsNewPos()
+				self.monsters_pos[x] = convToGridPos(mon_pos)
+
+			for p_idx, pos in enumerate(GameConfig.genPrisPosList(len(self.prisoners_pos))):
+				self.prisoners_pos[p_idx] = pos
+				
+		else:
+			self.tur_gui.resetAllTurtles()
+			self.drawAllTurtles()
+			self.updateObjPoses()
+
+	@staticmethod
+	def genMonsNewPos():
+		y = random.randint(TurtleGUI.lower_mons_y,TurtleGUI.upper_mons_y)
+		x = random.randint(TurtleGUI.lower_mons_x,TurtleGUI.upper_mons_x)
+		return (y,x)
+
+	@staticmethod
+	def genPrisNewPos():
+		x = random.randint(lower_pris_x,upper_pris_x)
+ 		y = random.randint(lower_pris_y, upper_pris_y)
+ 		return (y,x)
+
+ 	@staticmethod
+ 	def genPrisPosList(pris_num):
+ 		pris_pos_list = []
+		for x in range(pris_num):
+			pos = GameConfig.genPrisNewPos()
+			while pos in pris_pos_list:
+				pos = GameConfig.genPrisNewPos()
+			pris_pos_list.append(pos)
+		return pris_pos_list
+
+	def drawAllTurtles(self):
+		self.tur_gui.addMonsters(GameConfig.MONS_NUM, [self.genMonsNewPos() \
+			for x in range(GameConfig.MONS_NUM)])
+		self.tur_gui.addPrisoners(GameConfig.PRIS_NUM, \
+			self.genPrisPosList(GameConfig.PRIS_NUM))
+		self.tur_gui.addGoodGuy()
 
 	def getReward(self, state):
 		if self.isMonsterPos(state):
@@ -69,7 +116,6 @@ class QLearning():
 	def __init__(self, turtle_gui, nogui=False):
 		QLearning.NOGUI = nogui
 		self.turtle_gui = turtle_gui
-		self.drawAllTurtles()
 		self.gameConfig = GameConfig(turtle_gui)
 		self.weight_vector = Counter()
 		self.qLearn()
@@ -77,14 +123,14 @@ class QLearning():
 	def qLearn(self):
 		for episode in range(QLearning.EPISODES + QLearning.GAMES_TO_PLAY):
 			if episode >= QLearning.EPISODES:
-				self.turtle_gui.resetAllTurtles()
-				self.drawAllTurtles()
-				self.gameConfig.updateObjPoses(self.turtle_gui)
-			
+				QLearning.NOGUI = False
+				print "\nGame Playing", (episode + 1) - QLearning.EPISODES,
+			else:
+				print "\rTraining %d" % (episode + 1),
+				sys.stdout.flush()
+
 			curr_state = self.getStartStatePos() #start state
 			
-			print "\rTraining %d" % (episode + 1),
-			sys.stdout.flush()
 
 			while not self.gameConfig.isMonsterPos(curr_state) and \
 				not self.gameConfig.isGoalState(curr_state):
@@ -109,20 +155,9 @@ class QLearning():
 							* difference * f_vector[feature]
 					curr_state = self.gameConfig.guy_pos
 			
+
 			#new game
-			if QLearning.NOGUI:
-				for x in range(len(self.turtle_gui.monster_list)):
-					mon_pos = self.genMonsNewPos()
-					self.gameConfig.monsters_pos[x] = convToGridPos(mon_pos)
-
-				for p_idx, pos in enumerate(self.genPrisPosList(len(self.gameConfig.prisoners_pos))):
-					self.gameConfig.prisoners_pos[p_idx] = pos
-				
-			else:
-				self.turtle_gui.resetAllTurtles()
-				self.drawAllTurtles()
-				self.gameConfig.updateObjPoses(self.turtle_gui)
-
+			self.gameConfig.newGame()
 
 
 	def getQPrimeVal(self):
@@ -141,16 +176,12 @@ class QLearning():
 		sample = np.random.choice(acts,p=weights,size=1)[0]
 		return (self.getNextState(state,sample), sample)
 		
-		#actions = self.getLegalActions(state)
-		#action = max([(self.getQValue(state,act),act) for act in actions],key=lambda x: x[0])
-		#return (self.getNextState(state,action[1]), action[1])
 
 	def getNextState(self,state,action_str):
 		base_move = self.gameConfig.actions[action_str]
 		return (state[0]+base_move[0], state[1]+base_move[1])
 
 	def getStartStatePos(self,isRandom=True):
-
 		if isRandom:
 			y = random.randint(0,gridsize-1)
 			x = random.randint(0,gridsize-1)
@@ -282,33 +313,6 @@ class QLearning():
 			for idx, mon in enumerate(self.turtle_gui.monster_list):
 				mon.move(self.gameConfig.monsters_pos[idx])
 				mon.drawTurtle()
-
-	def genMonsNewPos(self):
-		y = random.randint(TurtleGUI.lower_mons_y,TurtleGUI.upper_mons_y)
-		x = random.randint(TurtleGUI.lower_mons_x,TurtleGUI.upper_mons_x)
-		return (y,x)
-
-	def genPrisNewPos(self):
-		x = random.randint(lower_pris_x,upper_pris_x)
- 		y = random.randint(lower_pris_y, upper_pris_y)
- 		return (y,x)
-
- 	def genPrisPosList(self,pris_num):
- 		pris_pos_list = []
-		for x in range(pris_num):
-			pos = self.genPrisNewPos()
-			while pos in pris_pos_list:
-				pos = self.genPrisNewPos()
-			pris_pos_list.append(pos)
-		return pris_pos_list
-
-	def drawAllTurtles(self):
-		mons_num = 1
-		pris_num = 4
-
-		self.turtle_gui.addMonsters(mons_num, [self.genMonsNewPos() for x in range(mons_num)])
-		self.turtle_gui.addPrisoners(pris_num, self.genPrisPosList(pris_num))
-		self.turtle_gui.addGoodGuy()
 		
 
 def main():
