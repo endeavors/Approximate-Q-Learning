@@ -8,8 +8,8 @@ class GameConfig():
 	PRISONER_RW = 100
 	MONSTER_RW = -100
 	REST_RW = -10
-	PROB_OF_ATTACK = 0.5
-	MONS_NUM = 1
+	PROB_OF_ATTACK = 0.9
+	MONS_NUM = 15
 	PRIS_NUM = 4
 
 	def __init__(self, turtle_gui):

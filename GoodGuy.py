@@ -16,6 +16,8 @@ class QLearning():
 		self.turtle_gui = turtle_gui
 		self.gameConfig = GameConfig(turtle_gui)
 		self.weight_vector = Counter()
+		self.astar = AStar(self.gameConfig.walls, GameConfig.actions.values())
+		self.distance_table = Counter()
 		self.qLearn()
 
 	def qLearn(self):
@@ -24,7 +26,7 @@ class QLearning():
 				QLearning.NOGUI = False
 				if episode == QLearning.EPISODES:
 					print "\n"
-					
+
 				print "Game Playing", (episode + 1) - QLearning.EPISODES,
 			else:
 				print "Training %d" % (episode + 1),
@@ -35,6 +37,8 @@ class QLearning():
 				self.gameConfig.isGoalState(curr_state):
 		
 				new_guy_pos_tup = self.getAction(curr_state,episode)
+				#print new_guy_pos_tup
+
 				mons_pos_acts = map(lambda pos: self.getMonsterLegalActions(pos), 
 					self.gameConfig.monsters_pos)
 					
@@ -53,6 +57,7 @@ class QLearning():
 					self.weight_vector[feature] = old_weight + QLearning.LEARNING_RATE \
 						* difference * f_vector[feature]
 				curr_state = self.gameConfig.guy_pos
+
 			
 			eaten = self.gameConfig.isMonsterPos(curr_state)
 			goal_reached = self.gameConfig.isGoalState(curr_state)
@@ -125,7 +130,16 @@ class QLearning():
 		base_move = self.gameConfig.actions[action]
 		next_pos = (state[0] + base_move[0], state[1] + base_move[1])
 
-		dist_to_rw = manhattan_dist(next_pos,self.gameConfig.getRewardPos())
+		dist_to_rw = 0
+		if self.isInRadiusToWall(state):
+			if next_pos not in self.distance_table:
+				dist_to_rw = self.astar.astar(next_pos,self.gameConfig.getRewardPos())
+				self.distance_table[next_pos] = dist_to_rw
+			else:
+				dist_to_rw = self.distance_table[next_pos]
+		else:
+			dist_to_rw = manhattan_dist(next_pos,self.gameConfig.getRewardPos())
+		
 		dist_to_mon = min([manhattan_dist(next_pos,mon_pos) for mon_pos in \
 			self.gameConfig.monsters_pos])
 		features = Counter()	
@@ -134,6 +148,28 @@ class QLearning():
 			for mon_pos in self.gameConfig.monsters_pos)
 
 		return features
+
+	def isInRadiusToWall(self,state):
+		#we only care if the guy is below the wall
+		miny = (convYToGridPos(wall2_y)+1)
+		if state[0] <= miny or state[0] >= \
+			(convYToGridPos(wall1_y)+1):
+			return False
+	
+		radius_list = []
+		for val in GameConfig.actions.values():
+			zipy, zipx = zip(state,val)
+			y = sum(zipy)
+			x = sum(zipx)
+			if y >= 0 and y <= gridsize and x >= 0 and x <= gridsize:
+				radius_list.append((y,x))
+
+		filtered_walls = filter(lambda x: x[0] == miny, self.gameConfig.walls)
+		intersection = set(filtered_walls) & set(radius_list)
+		if not intersection:
+			#set was empty
+			return False
+		return True
 
 	def getQValue(self,state, action):
 		q_val = 0
