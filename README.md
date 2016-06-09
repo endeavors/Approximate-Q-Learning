@@ -1,8 +1,8 @@
 #The Good Guy
 
-##Approximate Q-Learning with Linear Function Approximation/Boltzmann Exploration Optimization/A* Search
+##Approximate Q-Learning with Linear Function Approximation/ Boltzmann Exploration Optimization/ A* Search
 
-![Alt text](https://cloud.githubusercontent.com/assets/10402322/15916830/713008d6-2dab-11e6-888b-5711098121e5.png)
+![Alt text](https://cloud.githubusercontent.com/assets/10402322/15918464/d34ff016-2dbb-11e6-8782-7a2ff33e950c.png)
 
 ### How do you run this game?
 ```Python
