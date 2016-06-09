@@ -9,7 +9,7 @@ class GameConfig():
 	MONSTER_RW = -100
 	REST_RW = -10
 	PROB_OF_ATTACK = 0.5
-	MONS_NUM = 1
+	MONS_NUM = 4
 	PRIS_NUM = 4
 
 	def __init__(self, turtle_gui):

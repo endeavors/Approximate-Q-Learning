@@ -4,7 +4,7 @@ import math, sys
 import numpy as np
 
 class QLearning():
-	LEARNING_RATE = 0.7
+	LEARNING_RATE = 0.5
 	DISCOUNT_FACTOR = 0.6 
 	EPISODES = 500
 	TEMPERATURE = 30.0
@@ -259,7 +259,7 @@ def main():
   	turtle.setup (screen_width, screen_height, None, None)
   	turtle_gui = TurtleGUI()
 
-	QLearning(turtle_gui,True)
+	QLearning(turtle_gui)
 	
 	turtle.done()
 	

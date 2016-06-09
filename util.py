@@ -12,9 +12,9 @@ starty = int(math.ceil(origin[0] + (sq_length/2)))
 startx = int(math.ceil(origin[0] + (sq_length/2)))
 endy = int(math.ceil(origin[1] + (sq_length/2)))
 endx = int(math.ceil(origin[1] + (sq_length/2))) 
-gridsize = 15 #20
+gridsize = 15
 step = abs(origin[0] - origin[1])/gridsize #30
-wall_length = 5
+wall_length = 4
 wall1_y = starty + (2 *step)
 wall2_y = endy - (2*step)
 
