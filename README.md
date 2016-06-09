@@ -20,4 +20,4 @@ python GoodGuy.py
 	* Manhattan distance doesn't account for walls in the grid space but A* does. We only use this when we detect walls in the Robot's sensing radius, otherwise it would be very expensive and lame. 
 
 * GUI is built on Turlte Graphics. 
-* You can customize the GUI however you like it. All features are connected, so changing one thing automatically adjusts the neighboring features (aka. responsive design)
+* You can customize the GUI however you like it. All features are connected, so changing one thing automatically adjusts the neighboring features (aka. responsive design) 
