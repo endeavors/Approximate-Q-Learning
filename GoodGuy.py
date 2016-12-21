@@ -4,14 +4,14 @@ import math, sys
 import numpy as np
 
 class QLearning():
-	LEARNING_RATE = 0.5
-	DISCOUNT_FACTOR = 0.6 
-	EPISODES = 500
-	TEMPERATURE = 30.0
+	LEARNING_RATE = 0.01
+	DISCOUNT_FACTOR = 0.5
+	EPISODES = 1000
+	TEMPERATURE = 2
 	GAMES_TO_PLAY = 10
 	NOGUI = False
 
-	def __init__(self, turtle_gui, nogui=False):
+	def __init__(self, turtle_gui, nogui=True):
 		QLearning.NOGUI = nogui
 		self.turtle_gui = turtle_gui
 		self.gameConfig = GameConfig(turtle_gui)
