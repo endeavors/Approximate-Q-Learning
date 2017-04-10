@@ -1,6 +1,6 @@
-#The Good Guy
+# The Good Guy
 
-##Approximate Q-Learning with Linear Function Approximation/ Boltzmann Exploration Optimization/ A* Search
+## Approximate Q-Learning with Linear Function Approximation/ Boltzmann Exploration Optimization/ A* Search
 
 ![Alt text](https://cloud.githubusercontent.com/assets/10402322/15918464/d34ff016-2dbb-11e6-8782-7a2ff33e950c.png)
 
